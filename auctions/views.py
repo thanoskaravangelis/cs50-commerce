@@ -1,6 +1,9 @@
 from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.models import AnonymousUser
 from django.db import IntegrityError
 from django.http import HttpResponse, HttpResponseRedirect
+from django.http.response import HttpResponseBadRequest
+from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
 from django.urls import reverse
 
@@ -114,10 +117,36 @@ def create_listing(request):
         })   
 
 def display_listing(request, listing_id):
+    l = Listing.objects.get(pk=int(listing_id))
+    if request.user.is_authenticated:
+        if l in request.user.watchlist.all():
+            s = True
+        else :
+            s = False
+    else :
+        s = False
+    
     return render(request, "auctions/listing.html", {
-        "listing" : Listing.objects.get(pk=listing_id),
-        "bids" : Listing.objects.get(pk=listing_id).listing_bids.all()
+        "listing" : l,
+        "bids" : l.listing_bids.all(),
+        "saved" : s
     })
+
+@login_required
+def addtowatch(request,listing_id):
+    l = Listing.objects.get(pk=int(listing_id))
+    
+    request.user.watchlist.add(l)
+
+    return display_listing(request,listing_id)
+
+@login_required
+def removefromwatch(request,listing_id):
+    l = Listing.objects.get(pk=int(listing_id))
+    
+    request.user.watchlist.remove(l)
+
+    return display_listing(request,listing_id)
 
 def categories(request):
     return render(request, "auctions/categories.html", {
@@ -126,5 +155,28 @@ def categories(request):
 
 def category_listings(request,cat_name):
     return render(request,"auctions/index.html", {
+        "category" : cat_name,
         "listings" : Category.objects.get(name=cat_name).listings.all()
     })
+
+@login_required
+def watchlist(request,user_id):
+    u = request.user
+    all_listings = u.watchlist.all()
+    return render(request,"auctions/watchlist.html", {
+        "count" : all_listings.count(),
+        "listings" : all_listings,
+        "user_id" : int(user_id)
+    })
+
+@login_required
+def remove_from_watchlist(request,user_id,listing_id):
+    try:
+        l = Listing.objects.get(pk = int(listing_id))
+    except Listing.DoesNotExist:
+        return HttpResponseBadRequest("Bad Request: this listing does not exist")
+    request.user.watchlist.remove(l)
+    
+    return HttpResponseRedirect(reverse("watchlist",args={user_id}))
+
+

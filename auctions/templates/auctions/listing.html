@@ -6,6 +6,18 @@
         {% if listing.image %}
             <img src="{{ listing.image.url }}" alt="prod_img">
         {% endif %}
-        <div>{{listing.starting_bid}}€</div>
+        <div>Current price:{{listing.starting_bid}}€</div>
         <div>In category: {{listing.category.name}}</div>
+        {{ saved }}
+        {% if user.is_authenticated %}
+            {% if saved%}
+                <form action="{% url 'addtowatch' listing.pk%}">
+                    <input type="submit" value="Remove from watchlist 💔"/>
+                </form>
+            {% else %}
+                <form action="{% url 'removefromwatch' listing.pk%}">
+                    <input type="submit" value="Add to watchlist ❤️"/>
+                </form>
+            {% endif %}
+        {% endif %}
 {% endblock %}

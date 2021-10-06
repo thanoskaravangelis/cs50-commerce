@@ -4,7 +4,7 @@ from django.db.models.deletion import CASCADE, DO_NOTHING, SET_NULL
 
 
 class User(AbstractUser):
-    pass
+    watchlist = models.ManyToManyField('Listing', related_name = "users_saved")
 
 class Category(models.Model):
     name = models.CharField(max_length=64)
@@ -40,11 +40,5 @@ class Comment(models.Model):
     def __str__(self):
         return f"\"{self.text}\" made by {self.user.get_username()} in listing with id: {self.listing.id}"
 
-class SavedListing(models.Model):
-    user = models.ForeignKey(User,on_delete=models.CASCADE,related_name="my_saved")
-    listing = models.ForeignKey(Listing,on_delete=models.CASCADE,related_name="listing_saved")
-
-    def __str__(self):
-        return f"by user {self.user.pk} , listing with id:{self.listing.pk}"
 
 

@@ -1,7 +1,7 @@
 {% extends "auctions/layout.html" %}
 
 {% block body %}
-    <h2>Active Listings</h2>
+    <h2>Active Listings {%if category %} in category "{{category}}" {% endif %}</h2>
 
     {% for listing in listings %}
         <div>_________________________________________________________________________________________</div>
@@ -9,7 +9,7 @@
         {% if listing.image %}
             <img src="{{ listing.image.url }}" alt="prod_img">
         {% endif %}
-        <div>{{listing.starting_bid}}€</div>
+        <div>Current price: {{listing.starting_bid}}€</div>
         <div>In category: {{listing.category.name}}</div>
     {% endfor %}
 {% endblock %}
