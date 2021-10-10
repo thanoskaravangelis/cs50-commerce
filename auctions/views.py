@@ -1,19 +1,28 @@
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import AnonymousUser
+from django.core.checks.messages import DEBUG
 from django.db import IntegrityError
+from django.db.models.aggregates import Max
+from django.db.models.fields import DecimalField
 from django.http import HttpResponse, HttpResponseRedirect
 from django.http.response import HttpResponseBadRequest
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
 from django.urls import reverse
+from decimal import Decimal
 
-from .models import Category, Listing, User
+from .models import *
 
 
 
 def index(request):
+    if request.user.is_authenticated:
+        saved = request.user.watchlist.all()
+    else :
+        saved = []
     return render(request, "auctions/index.html", {
-        "listings" : Listing.objects.all()
+        "listings" : Listing.objects.all(),
+        "saved" : saved
     })
 
 
@@ -71,7 +80,7 @@ def register(request):
 def create_listing(request):
     if request.method == "POST":
         imageEx = categoryEx = False
-        user = User.objects.get(pk=1)
+        user = request.user
         if request.POST["title"]:
             title = request.POST["title"]
         else :
@@ -118,35 +127,79 @@ def create_listing(request):
 
 def display_listing(request, listing_id):
     l = Listing.objects.get(pk=int(listing_id))
+    u = User.objects.get(pk = request.user.pk)
+
     if request.user.is_authenticated:
-        if l in request.user.watchlist.all():
+        if l in u.watchlist.all():
             s = True
         else :
             s = False
     else :
         s = False
+
+    if request.method == "POST":
+        user = request.user
+        l_id = request.POST["listing_id"]
+        l = Listing.objects.get(id=l_id)
+
+        if request.POST["bid_value"]:
+            value = Decimal(request.POST["bid_value"])
+            price = l.curr_price if l.curr_price else l.starting_bid
+            if value <= price:
+                return render(request, "auctions/listing.html", {
+                "listing" : l,
+                "bids" : l.listing_bids.all(),
+                "saved" : s,
+                "error_message" : "Enter a bid higher than the current price please.",
+                "comments" : l.listing_comments.all()
+            })
+        else: 
+            return render(request, "auctions/listing.html", {
+                "listing" : l,
+                "bids" : l.listing_bids.all(),
+                "saved" : s,
+                "error_message" : "Enter a value for the bid please.",
+                "comments" : l.listing_comments.all()
+            })
     
-    return render(request, "auctions/listing.html", {
-        "listing" : l,
-        "bids" : l.listing_bids.all(),
-        "saved" : s
-    })
+        bid = Bid.objects.create(value=value,listing=l,user=user)
+        bid.save()
+
+        if l.listing_bids.all():
+            l.curr_price = (l.listing_bids.all().aggregate(Max('value')).get('value__max'))
+            l.winner = l.listing_bids.all().order_by('value').reverse()[0].user
+            l.save()
+
+        return render(request, "auctions/listing.html", {
+            "listing" : l,
+            "bids" : l.listing_bids.all(),
+            "saved" : s,
+            "success_message" : "Bid placed successfully",
+            "comments" : l.listing_comments.all()
+        })
+
+    else :
+        
+        return render(request, "auctions/listing.html", {
+            "listing" : l,
+            "bids" : l.listing_bids.all(),
+            "saved" : s,
+            "comments" : l.listing_comments.all()
+        })
 
 @login_required
 def addtowatch(request,listing_id):
-    l = Listing.objects.get(pk=int(listing_id))
-    
-    request.user.watchlist.add(l)
-
-    return display_listing(request,listing_id)
+    l = Listing.objects.get(id=listing_id)
+    u = request.user
+    u.watchlist.add(l)
+    return HttpResponseRedirect(reverse("onelisting",args={listing_id}))
 
 @login_required
 def removefromwatch(request,listing_id):
-    l = Listing.objects.get(pk=int(listing_id))
-    
-    request.user.watchlist.remove(l)
-
-    return display_listing(request,listing_id)
+    l = Listing.objects.get(id=listing_id)
+    u = request.user
+    u.watchlist.remove(l)
+    return HttpResponseRedirect(reverse("onelisting",args={listing_id}))
 
 def categories(request):
     return render(request, "auctions/categories.html", {
@@ -179,4 +232,39 @@ def remove_from_watchlist(request,user_id,listing_id):
     
     return HttpResponseRedirect(reverse("watchlist",args={user_id}))
 
+@login_required
+def close_listing(request,listing_id):
+    try: 
+        l = Listing.objects.get(pk = int(listing_id))
+    except Listing.DoesNotExist:
+        return HttpResponseBadRequest("Bad Request: this listing does not exist")
+    
+    l.closed = True
+    l.users_saved.clear()
+    l.save()
 
+    return HttpResponseRedirect(reverse("mylistings"))
+
+@login_required
+def add_comment(request,listing_id):
+    if request.method == "POST":
+        try: 
+            l = Listing.objects.get(pk = int(listing_id))
+        except Listing.DoesNotExist:
+            return HttpResponseBadRequest("Bad Request: this listing does not exist")
+        
+        comm = Comment.objects.create(user = request.user, listing=l, text=request.POST["text"])
+        comm.save() 
+
+        return render(request,"auctions/listing.html",{
+            "listing" : l,
+            "bids" : l.listing_bids.all(),
+            "saved" : l in request.user.watchlist.all(),
+            "comments" : l.listing_comments.all()
+        })
+
+@login_required
+def my_listings(request):
+    return render(request,"auctions/mylistings.html",{
+        "listings" : request.user.my_listings.all()
+    })

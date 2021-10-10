@@ -1,23 +1,95 @@
 {% extends "auctions/layout.html" %}
 
 {% block body %}
+        {% if listing.closed %}
+            {% if listing.winner == user %}
+                <div class="alert alert-success" role="alert">
+                    You have won this auction!
+                </div>
+            {% else %}
+                <div class="alert alert-info" role="alert">
+                    <strong>{{listing.winner.username}}</strong> won this auction!
+                </div>
+            {% endif %}
+        {% endif %}
+
         <div>_________________________________________________________________________________________</div>
         <h3>{{listing.title}}</h3>
         {% if listing.image %}
             <img src="{{ listing.image.url }}" alt="prod_img">
         {% endif %}
-        <div>Current price:{{listing.starting_bid}}€</div>
+        <div>Current price: {% if listing.curr_price %} {{listing.curr_price}} {% else %} {{listing.starting_bid}} {% endif %}€</div>        <div>Listed by: {{listing.user.username}}</div>
         <div>In category: {{listing.category.name}}</div>
-        {{ saved }}
-        {% if user.is_authenticated %}
+        {% if user.is_authenticated and user.pk != listing.user.pk and listing.closed == False%}
             {% if saved%}
-                <form action="{% url 'addtowatch' listing.pk%}">
-                    <input type="submit" value="Remove from watchlist 💔"/>
-                </form>
+                <div>
+                    <a href="{% url 'removefromwatch' listing.pk%}" role = "button">Remove from watchlist 💔</a>
+                </div>
             {% else %}
-                <form action="{% url 'removefromwatch' listing.pk%}">
-                    <input type="submit" value="Add to watchlist ❤️"/>
+                <div>
+                    <a href="{% url 'addtowatch' listing.pk%}">Add to watchlist ❤️</a>
+                </div>
+            {% endif %}
+        {% endif %}
+
+
+        <!--Bids-->
+        {% if listing.closed == False %}
+            <form action="{% url 'onelisting' listing.pk%}" method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="bid-inp">Add a new bid (Highest bid is currently held by: {{listing.winner}})</label>
+                    <div style="color:red">{{error_message}}</div>
+                    <div style="color:green">{{success_message}}</div>
+                    <input autofocus class="form-control" id="bid-inp" type="number" name="bid_value" step=".01" min="0" max="9999999" placeholder="Place Bid">                
+                </div>
+                <input type="hidden" name="listing_id" value="{{listing.pk}}">
+                <input class="btn btn-primary" type="submit" value="Place">
+            </form>
+        {% endif %}
+
+        <div>
+            <h4 style="text-decoration:underline; margin-top:30px"> Bids </h4>
+            {% for bid in bids %}
+                <div>Bid: {{bid.value}} set by user {{bid.user.username}}</div>
+            {% endfor %}
+            <div> Starting Bid: {{listing.starting_bid}} set by user {{listing.user.username}}
+        </div>
+        
+        
+        <!--Close Listing-->
+        {% if user.pk == listing.user.pk and listing.closed == False %}
+            <div style="margin-top:30px">This item was listed by you. If you would you like to close this listing, click the close button below.</div>
+            <form action="{% url 'closelisting' listing.pk %}" method="post">
+                {% csrf_token %}
+                <button type="submit" onclick="return confirm('Are you sure you want to close this listing now?')" class="btn btn-danger">Close Listing</button>
+            </form>
+        {% endif %}
+
+        <!--Comments-->
+        {% if comments %}
+            <h5 style="text-decoration:underline; margin-top:30px">Comments</h5>
+            {% for comment in comments %}
+                <div>
+                    <div>{{comment.text}}</div>
+                    <div>>> by user: {{comment.user.username}}
+                </div>
+            {% endfor %}
+        {% else %}
+            <div style="text-decoration:none; margin-top:30px">No comments have been made.</div>
+        {% endif %}
+
+        {% if listing.closed == False %}
+            {% if user.is_authenticated %}
+                <form action="{% url 'addcomment' listing.pk %}" method="post">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label for="exampleFormControlTextarea1">Add a comment</label>
+                        <textarea class="form-control" id="exampleFormControlTextarea1" rows="3" name="text" placeholder="Type your comment..."></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Enter</button>
                 </form>
             {% endif %}
         {% endif %}
+
 {% endblock %}

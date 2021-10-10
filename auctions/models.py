@@ -16,10 +16,12 @@ class Listing(models.Model):
     title = models.CharField(max_length = 128)
     description = models.CharField(max_length = 1024)
     starting_bid = models.DecimalField(max_digits=8,decimal_places=2)
-    closed = models.BooleanField(default=False)
+    curr_price = models.DecimalField(max_digits=8,decimal_places=2,null=True,blank=True)
+    closed = models.BooleanField(null=True)
     image = models.ImageField(upload_to="images/",blank=True,null=True)
     category = models.ForeignKey(Category,on_delete=models.SET_NULL, related_name="listings", blank=True,null=True)
     user = models.ForeignKey(User,on_delete=models.CASCADE,related_name="my_listings")
+    winner = models.ForeignKey(User,on_delete=models.SET_NULL,related_name="my_won",blank=True,null=True)
 
     def __str__(self):
         return f"{self.pk}: {self.title}"

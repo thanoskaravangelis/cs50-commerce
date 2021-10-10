@@ -26,7 +26,6 @@
         <div class="form-group">
                 <label class="my-1 mr-2" for="categoryselector">Category</label>
                 <select class="mdb-select md-form" searchable="Search here.." name="category" id="categoryselector">
-                    <option value="" disabled selected>Choose your category...</option>
                     {% for category in categories %}
                         <option value="{{ category.name }}">{{ category.name }}</option>
                     {% endfor %}

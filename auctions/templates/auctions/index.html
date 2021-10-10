@@ -4,12 +4,26 @@
     <h2>Active Listings {%if category %} in category "{{category}}" {% endif %}</h2>
 
     {% for listing in listings %}
-        <div>_________________________________________________________________________________________</div>
-        <a href="{% url 'onelisting' listing.pk %}">{{listing.title}}</a><br>
-        {% if listing.image %}
-            <img src="{{ listing.image.url }}" alt="prod_img">
+        {% if listing.closed == False or listing.closed == None%}
+            <div>_________________________________________________________________________________________</div>
+            <a href="{% url 'onelisting' listing.pk %}">{{listing.title}}</a><br>
+            {% if listing.image %}
+                <img src="{{ listing.image.url }}" alt="prod_img">
+            {% endif %}
+            <div>Current price: {% if listing.curr_price %} {{listing.curr_price}} {% else %} {{listing.starting_bid}} {% endif %}€</div>
+            <div>Listed by: {{listing.user.username}}</div>
+            <div>In category: {{listing.category.name}}</div>
+            {% if user.is_authenticated and user.pk != listing.user.pk %}
+                {% if listing in saved%}
+                    <div>
+                        <a href="{% url 'removefromwatch' listing.pk%}">Remove from watchlist 💔</a>
+                    </div>
+                {% else %}
+                    <div>
+                        <a href="{% url 'addtowatch' listing.pk%}">Add to watchlist ❤️</a>
+                    </div>
+                {% endif %}
+            {% endif %}
         {% endif %}
-        <div>Current price: {{listing.starting_bid}}€</div>
-        <div>In category: {{listing.category.name}}</div>
     {% endfor %}
 {% endblock %}
