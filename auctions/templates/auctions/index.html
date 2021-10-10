@@ -5,7 +5,7 @@
 
     {% for listing in listings %}
         {% if listing.closed == False or listing.closed == None%}
-            <div>_________________________________________________________________________________________</div>
+            <hr>
             <a href="{% url 'onelisting' listing.pk %}">{{listing.title}}</a><br>
             {% if listing.image %}
                 <img src="{{ listing.image.url }}" alt="prod_img">

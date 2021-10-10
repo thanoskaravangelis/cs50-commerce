@@ -13,7 +13,7 @@
             {% endif %}
         {% endif %}
 
-        <div>_________________________________________________________________________________________</div>
+        <hr>
         <h3>{{listing.title}}</h3>
         {% if listing.image %}
             <img src="{{ listing.image.url }}" alt="prod_img">
@@ -34,6 +34,7 @@
 
 
         <!--Bids-->
+        <hr>
         {% if listing.closed == False %}
             <form action="{% url 'onelisting' listing.pk%}" method="post" enctype="multipart/form-data">
                 {% csrf_token %}
@@ -59,6 +60,7 @@
         
         <!--Close Listing-->
         {% if user.pk == listing.user.pk and listing.closed == False %}
+            <hr>
             <div style="margin-top:30px">This item was listed by you. If you would you like to close this listing, click the close button below.</div>
             <form action="{% url 'closelisting' listing.pk %}" method="post">
                 {% csrf_token %}
@@ -68,6 +70,7 @@
 
         <!--Comments-->
         {% if comments %}
+            <hr>
             <h5 style="text-decoration:underline; margin-top:30px">Comments</h5>
             {% for comment in comments %}
                 <div>
@@ -76,6 +79,7 @@
                 </div>
             {% endfor %}
         {% else %}
+            <hr>
             <div style="text-decoration:none; margin-top:30px">No comments have been made.</div>
         {% endif %}
 
