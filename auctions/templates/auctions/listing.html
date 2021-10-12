@@ -14,6 +14,7 @@
         {% endif %}
 
         <hr>
+        <div class="main-page-container">
         <h3>{{listing.title}}</h3>
         {% if listing.image %}
             <img src="{{ listing.image.url }}" alt="prod_img">
@@ -23,11 +24,11 @@
         {% if user.is_authenticated and user.pk != listing.user.pk and listing.closed == False%}
             {% if saved%}
                 <div>
-                    <a href="{% url 'removefromwatch' listing.pk%}" role = "button">Remove from watchlist 💔</a>
+                    <a class="btn btn-primary" role="button"class="btn btn-primary" role="button" href="{% url 'removefromwatch' listing.pk%}" role = "button">Remove from watchlist 💔</a>
                 </div>
             {% else %}
                 <div>
-                    <a href="{% url 'addtowatch' listing.pk%}">Add to watchlist ❤️</a>
+                    <a class="btn btn-primary" role="button" href="{% url 'addtowatch' listing.pk%}">Add to watchlist ❤️</a>
                 </div>
             {% endif %}
         {% endif %}
@@ -95,5 +96,6 @@
                 </form>
             {% endif %}
         {% endif %}
+    </div>
 
 {% endblock %}

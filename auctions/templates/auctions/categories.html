@@ -1,10 +1,16 @@
 {% extends "auctions/layout.html" %}
 
 {% block body %}
-
-    {% for category in categories %}
-        <a href="{% url 'categorylistings' category.name %}">{{category.name}}</a>
-        <br>
-    {% endfor %}
+    <div class="main-page-container">
+    <h3>All categories</h3>
+        <div class="cat-flex">
+            {% for category in categories %}
+                <div class="cat-flex-item">
+                    <a class="cat-link" href="{% url 'categorylistings' category.name %}">{{category.name}}</a>
+                    <br>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
 
 {% endblock %}
