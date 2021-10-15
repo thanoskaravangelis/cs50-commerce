@@ -4,8 +4,9 @@
 <html lang="en">
     <head>
         <title>{% block title %}Auctions{% endblock %}</title>
+        <link rel="icon" href="media/images/img_19298.png">
         <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
-        <link href="{% static 'auctions/styles1.css' %}" rel="stylesheet">
+        <link href="{% static 'auctions/styles.css' %}" rel="stylesheet">
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
@@ -18,16 +19,16 @@
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav mr-auto">
-                    <li class="nav-item active">
-                        <a class="nav-link" href="{% url 'index' %}">Active Listings <span class="sr-only">(current)</span></a>
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.resolver_match.url_name == 'index' %}active{% endif %}" href="{% url 'index' %}">Active Listings</a>
                     </li>
                     {% if user.is_authenticated %}
                         <li class="nav-item">
-                            <a class="nav-link" href="{% url 'create' %}">Create New Listing</a>
+                            <a class="nav-link {% if request.resolver_match.url_name == 'create' %}active{% endif %}" href="{% url 'create' %}">Create New Listing</a>
                         </li>
                     {% endif %}
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'categories' %}">Categories</a>
+                        <a class="nav-link {% if request.resolver_match.url_name == 'categories' %}active{% endif %}" href="{% url 'categories' %}">Categories</a>
                     </li>
                 </ul>
                 {% if user.is_authenticated %}

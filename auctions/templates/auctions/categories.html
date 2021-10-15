@@ -1,15 +1,18 @@
 {% extends "auctions/layout.html" %}
 
 {% block body %}
-    <div class="main-page-container">
-    <h3>All categories</h3>
-        <div class="cat-flex">
-            {% for category in categories %}
-                <div class="cat-flex-item">
-                    <a class="cat-link" href="{% url 'categorylistings' category.name %}">{{category.name}}</a>
-                    <br>
-                </div>
-            {% endfor %}
+    <div class="big-main-container">
+        <div class="main-page-container">
+        <h2 class="title-list">All categories</h2><hr>
+            <div class="cat-flex">
+                {% for category in categories %}
+                    <div class="cat-flex-item">
+                        <img src="{{category.image.url}}" height="200px" width="200px" alt="cat-img"/>
+                        <a class="cat-link" href="{% url 'categorylistings' category.name %}">{{category.name}}</a>
+                        <br>
+                    </div>
+                {% endfor %}
+            </div>
         </div>
     </div>
 

@@ -1,37 +1,41 @@
 {% extends "auctions/layout.html" %}
 
 {% block body %}
-    <div class="main-page-container">
-    <h1>Create a new listing</h1>
+    <div class="big-main-container">
+        <div class="main-page-container">
+            <div class="create">
+                <h2>Create a new listing</h2>
+                <hr>
+                <h5 style="color: red;">
+                    {{ message }}
+                </h5>
 
-    <h5 style="color: red;">
-        {{ message }}
-    </h5>
-
-    <form action="{% url 'create' %}" method="post" enctype="multipart/form-data">
-        {% csrf_token %}
-        <div class="form-group">
-            <input autofocus class="form-control" type="text" name="title" placeholder="Title">
+                <form action="{% url 'create' %}" method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <input autofocus class="form-control" type="text" name="title" placeholder="Title">
+                    </div>
+                    <div class="form-group">
+                        <textarea class="form-control"  rows="6" name="text" placeholder="Description Text"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <input autofocus class="form-control" type="number" name="starting_bid" step=".01" min="0" max="9999999" placeholder="Starting Bid">
+                    </div>
+                    <div class="form-group">
+                        <label for="image1">Image:</label>
+                        <input autofocus class="form-control-file" type="file" name="image" id="image1">
+                    </div>
+                    <div class="form-group">
+                            <label class="my-1 mr-2" for="categoryselector">Category:</label>
+                            <select class="mdb-select md-form" searchable="Search here.." name="category" id="categoryselector">
+                                {% for category in categories %}
+                                    <option value="{{ category.name }}">{{ category.name }}</option>
+                                {% endfor %}
+                        </select>
+                    </div>
+                    <input class="btn btn-primary" type="submit" value="Upload">
+                </form>
+            </div>
         </div>
-        <div class="form-group">
-            <textarea class="form-control"  rows="6" name="text" placeholder="Description Text"></textarea>
-          </div>
-        <div class="form-group">
-            <input autofocus class="form-control" type="number" name="starting_bid" step=".01" min="0" max="9999999" placeholder="Starting Bid">
-        </div>
-        <div class="form-group">
-            <label for="image1">Image:</label>
-            <input autofocus class="form-control-file" type="file" name="image" id="image1">
-        </div>
-        <div class="form-group">
-                <label class="my-1 mr-2" for="categoryselector">Category</label>
-                <select class="mdb-select md-form" searchable="Search here.." name="category" id="categoryselector">
-                    {% for category in categories %}
-                        <option value="{{ category.name }}">{{ category.name }}</option>
-                    {% endfor %}
-              </select>
-        </div>
-        <input class="btn btn-primary" type="submit" value="Upload">
-    </form>
     </div>
 {% endblock %}

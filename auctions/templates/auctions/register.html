@@ -1,30 +1,53 @@
-{% extends "auctions/layout.html" %}
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <link rel="icon" href="media/images/img_19298.png">
+        <title>{% block title %}Auctions{% endblock %}</title>
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+        <link href="{% static 'auctions/styles.css' %}" rel="stylesheet">
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+        <script src="{% static 'auctions/script.js' %}"></script>
+    </head>
 
 {% block body %}
+    <div class="login-page-container">
 
-    <h2>Register</h2>
+        <div id="title-flex">
+            <img id="img-hammer" src="media/images/img_19298.png" height="80px" width="80px" alt="hammer_img">
+            <div class="auction-it">Welcome to Auction It!   </div>
+        </div>
+        
+    <div class="login-container">
+        <h2 class="login-id">Register</h2>
+        <hr>
 
-    {% if message %}
-        <div>{{ message }}</div>
-    {% endif %}
+        {% if message %}
+            <div>{{ message }}</div>
+        {% endif %}
 
-    <form action="{% url 'register' %}" method="post">
-        {% csrf_token %}
-        <div class="form-group">
-            <input class="form-control" autofocus type="text" name="username" placeholder="Username">
-        </div>
-        <div class="form-group">
-            <input class="form-control" type="email" name="email" placeholder="Email Address">
-        </div>
-        <div class="form-group">
-            <input class="form-control" type="password" name="password" placeholder="Password">
-        </div>
-        <div class="form-group">
-            <input class="form-control" type="password" name="confirmation" placeholder="Confirm Password">
-        </div>
-        <input class="btn btn-primary" type="submit" value="Register">
-    </form>
+        <form action="{% url 'register' %}" method="post">
+            {% csrf_token %}
+            <div class="form-group">
+                <input class="form-control" autofocus type="text" name="username" placeholder="Username">
+            </div>
+            <div class="form-group">
+                <input class="form-control" type="email" name="email" placeholder="Email Address">
+            </div>
+            <div class="form-group">
+                <input class="form-control" type="password" name="password" placeholder="Password">
+            </div>
+            <div class="form-group">
+                <input class="form-control" type="password" name="confirmation" placeholder="Confirm Password">
+            </div>
+            <input class="btn btn-primary" type="submit" value="Register">
+        </form>
 
-    Already have an account? <a href="{% url 'login' %}">Log In here.</a>
+        Already have an account? <a href="{% url 'login' %}">Log In here.</a>
+    </div>
+    </div>
 
 {% endblock %}

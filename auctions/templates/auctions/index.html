@@ -2,32 +2,39 @@
 
 {% block body %}
     <div class="main-page-container">
-        <h2>Active Listings {%if category %} in category "{{category}}" {% endif %}</h2>
-
+        <h2 class="title-list">Active Listings {%if category %} in category "{{category}}" {% endif %}</h2>
+        <hr>
+        <div class="flex-index">
         {% for listing in listings %}
             {% if listing.closed == False or listing.closed == None%}
-                <hr>
                 <div class="one-listing">
-                <a class="l-title" href="{% url 'onelisting' listing.pk %}">{{listing.title}}</a><br>
-                {% if listing.image %}
-                    <img src="{{ listing.image.url }}" alt="prod_img">
-                {% endif %}
-                <div>Current price: {% if listing.curr_price %} {{listing.curr_price}} {% else %} {{listing.starting_bid}} {% endif %}€</div>
-                <div>Listed by: {{listing.user.username}}</div>
-                <div>In category: {{listing.category.name}}</div>
-                {% if user.is_authenticated and user.pk != listing.user.pk %}
-                    {% if listing in saved%}
-                        <div>
-                            <a class="btn btn-primary" role="button" href="{% url 'removefromwatch' listing.pk%}">Remove from watchlist 💔</a>
+                    <a class="l-title row-0-listing" href="{% url 'onelisting' listing.pk %}">{{listing.title}}</a><br>
+                    <div class="list-all">
+                        {% if listing.image %}
+                            <img src="{{ listing.image.url }}" height="200px" width="200px" alt="prod_img">
+                        {% endif %}
+                        <div class="list-details">
+                            <div class="l-curr-price">Current price: {% if listing.curr_price %} {{listing.curr_price}} {% else %} {{listing.starting_bid}} {% endif %}€</div>
+                            <div class="l-details">Description: {{listing.description}}</div>
+                            <div class="l-details">Listed by: {{listing.user.username}}</div>
+                            <div class="l-details">In category: {{listing.category.name}}</div>
+                            {% if user.is_authenticated and user.pk != listing.user.pk %}
+                                {% if listing in saved%}
+                                    <div>
+                                        <a class="btn btn btn-info" role="button" href="{% url 'removefromwatch' listing.pk%}">Remove from watchlist 💔</a>
+                                    </div>
+                                {% else %}
+                                    <div>
+                                        <a class="btn btn btn-light" role="button" href="{% url 'addtowatch' listing.pk%}">Add to watchlist ❤️</a>
+                                    </div>
+                                {% endif %}
+                            {% endif %}
                         </div>
-                    {% else %}
-                        <div>
-                            <a class="btn btn-primary" role="button" href="{% url 'addtowatch' listing.pk%}">Add to watchlist ❤️</a>
-                        </div>
-                    {% endif %}
-                {% endif %}
+                    </div>
                 </div>
+                <hr>
             {% endif %}
         {% endfor %}
+        </div>
     </div>
 {% endblock %}

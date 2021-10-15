@@ -127,9 +127,9 @@ def create_listing(request):
 
 def display_listing(request, listing_id):
     l = Listing.objects.get(pk=int(listing_id))
-    u = User.objects.get(pk = request.user.pk)
 
     if request.user.is_authenticated:
+        u = User.objects.get(pk = request.user.pk)
         if l in u.watchlist.all():
             s = True
         else :
